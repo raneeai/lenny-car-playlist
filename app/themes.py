@@ -1,0 +1,105 @@
+THEMES = {
+    "product": {
+        "label": "Product",
+        "keywords": [
+            "product",
+            "pm",
+            "prioritization",
+            "roadmap",
+            "ux",
+            "design",
+            "customer",
+            "feature",
+            "discovery",
+            "retention",
+            "activation",
+        ],
+    },
+    "growth": {
+        "label": "Growth",
+        "keywords": [
+            "growth",
+            "acquisition",
+            "activation",
+            "retention",
+            "cold start",
+            "viral",
+            "funnel",
+            "conversion",
+            "distribution",
+            "monetization",
+        ],
+    },
+    "ai": {
+        "label": "AI",
+        "keywords": [
+            "ai",
+            "llm",
+            "model",
+            "agent",
+            "anthropic",
+            "openai",
+            "claude",
+            "automation",
+            "prompt",
+            "inference",
+        ],
+    },
+    "productivity": {
+        "label": "Productivity",
+        "keywords": [
+            "focus",
+            "time",
+            "productivity",
+            "system",
+            "workflow",
+            "habit",
+            "calendar",
+            "meeting",
+            "tooling",
+            "efficiency",
+        ],
+    },
+    "leadership": {
+        "label": "Leadership",
+        "keywords": [
+            "leadership",
+            "leader",
+            "team",
+            "manager",
+            "culture",
+            "hiring",
+            "coach",
+            "trust",
+            "feedback",
+            "org",
+        ],
+    },
+    "career": {
+        "label": "Career",
+        "keywords": [
+            "career",
+            "promotion",
+            "interview",
+            "job",
+            "resume",
+            "hire",
+            "network",
+            "founder",
+            "operator",
+            "cold email",
+        ],
+    },
+}
+
+DEFAULT_THEME = "product"
+
+COMMANDS = {
+    "next",
+    "previous",
+    "repeat",
+    "stop",
+    "change topic",
+    "explain more",
+}
+
