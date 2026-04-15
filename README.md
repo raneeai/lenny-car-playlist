@@ -29,6 +29,7 @@ This repo contains a local-testable MVP prototype for `Lenny Executive Clips`.
 - renders clip-level audio with `ffmpeg`
 - serves playable local audio files
 - serves a local web UI for playlist generation and playback at `/`
+- supports installable PWA metadata and offline app-shell caching
 
 ## What is not finished yet
 
@@ -117,6 +118,13 @@ http://127.0.0.1:8000/audio/clips/amol-avasare-2836-2961.mp3
 4. Click `Generate playlist`
 5. Click `Prepare playable audio`
 6. Press `Play` on any prepared clip
+
+## PWA notes
+
+- the app exposes `manifest.webmanifest`
+- the browser registers a local service worker from `/sw.js`
+- the current PWA layer caches the app shell for faster reloads and installability
+- playlist data and audio files are still fetched live from the local server
 
 ## Project layout
 

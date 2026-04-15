@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lenny Car Playlists</title>
+    <meta
+      name="description"
+      content="A local-first driving companion that turns Lenny's podcast archive into playable executive clip playlists."
+    />
+    <meta name="theme-color" content="#1d6b57" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -52,6 +59,10 @@
         <div class="status-bar">
           <span id="statusText">Server ready.</span>
           <span id="healthText">Checking health...</span>
+        </div>
+        <div id="installBar" class="install-bar hidden">
+          <span>Install this demo to your home screen for a cleaner mobile experience.</span>
+          <button id="installBtn" class="ghost">Install app</button>
         </div>
       </section>
 

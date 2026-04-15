@@ -168,6 +168,15 @@ class LennyHandler(BaseHTTPRequestHandler):
         if parsed.path in {"/", "/index.html"}:
             send_file(self, WEB_DIR / "index.html")
             return
+        if parsed.path == "/manifest.webmanifest":
+            send_file(self, WEB_DIR / "manifest.webmanifest")
+            return
+        if parsed.path == "/sw.js":
+            send_file(self, WEB_DIR / "sw.js")
+            return
+        if parsed.path == "/icon.svg":
+            send_file(self, WEB_DIR / "icon.svg")
+            return
         if parsed.path.startswith("/web/"):
             asset_name = parsed.path.replace("/web/", "", 1)
             send_file(self, WEB_DIR / asset_name)

@@ -1,0 +1,18 @@
+{
+  "name": "Lenny Car Playlists",
+  "short_name": "Hi Lenny",
+  "description": "A local-first driving companion that turns Lenny's podcast archive into playable executive clip playlists.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f1eb",
+  "theme_color": "#1d6b57",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -15,6 +15,9 @@ const statusText = document.getElementById("statusText");
 const healthText = document.getElementById("healthText");
 const commandOutput = document.getElementById("commandOutput");
 const audioPlayer = document.getElementById("audioPlayer");
+const installBar = document.getElementById("installBar");
+const installBtn = document.getElementById("installBtn");
+let deferredInstallPrompt = null;
 
 async function request(path, options = {}) {
   const response = await fetch(path, {
@@ -165,3 +168,23 @@ document.querySelectorAll("[data-command]").forEach((button) => {
 });
 
 fetchHealth();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  installBar.classList.remove("hidden");
+});
+
+installBtn?.addEventListener("click", async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice.catch(() => {});
+  deferredInstallPrompt = null;
+  installBar.classList.add("hidden");
+});
