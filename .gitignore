@@ -6,3 +6,5 @@ __pycache__/
 dist/
 build/
 data/catalog.json
+data/audio/
+data/audio_index.json

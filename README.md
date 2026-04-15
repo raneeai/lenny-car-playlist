@@ -1,4 +1,19 @@
-# Lenny Executive Clips - Local MVP
+# lenny-car-playlists
+
+**Your personal Executive Assistant for Lenny's content.**
+
+Say **"Hi Lenny"** while driving to instantly receive hand-curated playlists made entirely from **original Lenny podcast clips** with **no TTS, only original audio**.
+
+Focused on the highest-value topics:
+
+- Product Management
+- Growth
+- AI
+- Productivity
+
+Built specifically for busy North American product leaders, Heads of Product, and founders who love Lenny's content but do not have time to listen to full episodes.
+
+## Local MVP
 
 This repo contains a local-testable MVP prototype for `Lenny Executive Clips`.
 
@@ -9,13 +24,17 @@ This repo contains a local-testable MVP prototype for `Lenny Executive Clips`.
 - creates clip candidates across the 6 MVP themes
 - builds playlists for prompts like `Growth cold start clips`
 - exposes a local JSON API with no third-party Python dependencies
+- resolves official podcast audio URLs from the Substack RSS feed
+- downloads source episode audio locally
+- renders clip-level audio with `ffmpeg`
+- serves playable local audio files
 
 ## What is not finished yet
 
-- original audio URL resolution from the public podcast feed
-- real clip extraction with `ffmpeg`
+- automatic bulk audio download and clip prewarming
 - mobile UI / PWA
 - on-device speech-to-text
+- stronger title matching fallbacks for the full archive
 
 The current prototype proves the content understanding and playlist generation layer first.
 
@@ -60,19 +79,39 @@ Force a fresh ingest:
 curl -X POST http://127.0.0.1:8000/api/ingest/sync
 ```
 
+Sync official audio mappings:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/audio/sync
+```
+
+Download one episode's source audio:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/audio/download \
+  -H 'Content-Type: application/json' \
+  -d '{"episode_id":"amol-avasare"}'
+```
+
+Render one clip into a playable mp3:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/audio/render \
+  -H 'Content-Type: application/json' \
+  -d '{"clip_id":"amol-avasare-2836-2961"}'
+```
+
+Then open the returned `audio_url`, for example:
+
+```bash
+http://127.0.0.1:8000/audio/clips/amol-avasare-2836-2961.mp3
+```
+
 ## Project layout
 
 - `app/ingest.py`: transcript parsing and clip candidate generation
 - `app/playlist.py`: query understanding and playlist assembly
+- `app/audio.py`: RSS audio resolution, download, and clip rendering
 - `app/server.py`: local HTTP API
 - `data-source/`: public Lenny data repo
 - `data/catalog.json`: generated local catalog cache
-
-## Next step
-
-Wire `AUDIO-201` and `AUDIO-204` from the backlog:
-
-1. resolve official episode audio URLs
-2. cache selected source files locally
-3. clip with `ffmpeg`
-4. return playable audio URLs instead of transcript-only items

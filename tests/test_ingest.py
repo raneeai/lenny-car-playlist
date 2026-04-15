@@ -1,6 +1,7 @@
 import pathlib
 import unittest
 
+from app.audio import build_audio_index, parse_rss_items
 from app.ingest import build_catalog, parse_transcript_segments
 from app.playlist import build_playlist, parse_query
 
@@ -38,7 +39,29 @@ This is a test.
         self.assertGreaterEqual(len(playlist["items"]), 1)
         self.assertEqual(playlist["theme"], "growth")
 
+    def test_parse_rss_and_build_audio_index(self):
+        xml_text = """<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <item>
+      <title><![CDATA[Anthropic’s $1B to $19B growth run: how Claude became the fastest-growing AI product in history | Amol Avasare]]></title>
+      <link>https://www.lennysnewsletter.com/p/example</link>
+      <enclosure url="https://cdn.example.com/amol.mp3" length="123" type="audio/mpeg"/>
+      <itunes:duration>3600</itunes:duration>
+    </item>
+  </channel>
+</rss>
+"""
+        items = parse_rss_items(xml_text)
+        self.assertEqual(len(items), 1)
+        catalog = build_catalog(ROOT / "data-source")
+        audio_index = build_audio_index(catalog["episodes"], items)
+        self.assertIn("amol-avasare", audio_index)
+        self.assertEqual(
+            audio_index["amol-avasare"]["audio_url"],
+            "https://cdn.example.com/amol.mp3",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
-
