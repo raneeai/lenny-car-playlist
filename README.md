@@ -28,6 +28,7 @@ This repo contains a local-testable MVP prototype for `Lenny Executive Clips`.
 - downloads source episode audio locally
 - renders clip-level audio with `ffmpeg`
 - serves playable local audio files
+- serves a local web UI for playlist generation and playback at `/`
 
 ## What is not finished yet
 
@@ -53,6 +54,7 @@ python3 scripts/run_server.py 8001
 
 Then open these endpoints:
 
+- `GET http://127.0.0.1:8000/`
 - `GET http://127.0.0.1:8000/api/health`
 - `GET http://127.0.0.1:8000/api/themes`
 - `GET http://127.0.0.1:8000/api/catalog`
@@ -106,6 +108,15 @@ Then open the returned `audio_url`, for example:
 ```bash
 http://127.0.0.1:8000/audio/clips/amol-avasare-2836-2961.mp3
 ```
+
+## Fastest demo flow
+
+1. Start the server
+2. Open `http://127.0.0.1:8000/`
+3. Click a prompt chip or enter your own query
+4. Click `Generate playlist`
+5. Click `Prepare playable audio`
+6. Press `Play` on any prepared clip
 
 ## Project layout
 

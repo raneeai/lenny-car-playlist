@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lenny Car Playlists</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/web/styles.css" />
+  </head>
+  <body>
+    <div class="grain"></div>
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Lenny Car Playlists</p>
+          <h1>Your driving-time executive assistant for Lenny's best clips.</h1>
+          <p class="lede">
+            Ask for Product, Growth, AI, Productivity, Leadership, or Career and
+            turn the public Lenny archive into a scannable, playable clip
+            playlist.
+          </p>
+        </div>
+        <div class="hero-card">
+          <p class="card-label">Try prompts</p>
+          <div class="chips">
+            <button class="chip" data-query="Hi Lenny, give me AI clips about agents and automation">
+              AI agents
+            </button>
+            <button class="chip" data-query="Hi Lenny, I am driving. Give me growth cold start clips">
+              Growth cold start
+            </button>
+            <button class="chip" data-query="I want leadership clips on hiring and feedback">
+              Leadership hiring
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="console">
+        <div class="prompt-row">
+          <textarea id="queryInput" rows="3">Hi Lenny, I am driving. Give me growth cold start clips</textarea>
+          <div class="actions">
+            <button id="generateBtn" class="primary">Generate playlist</button>
+            <button id="prepareBtn" class="secondary" disabled>Prepare playable audio</button>
+          </div>
+        </div>
+        <div class="status-bar">
+          <span id="statusText">Server ready.</span>
+          <span id="healthText">Checking health...</span>
+        </div>
+      </section>
+
+      <section class="player-layout">
+        <div class="playlist-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Current playlist</p>
+              <h2 id="playlistTitle">No playlist yet</h2>
+            </div>
+            <div id="playlistMeta" class="meta"></div>
+          </div>
+          <div id="playlistItems" class="playlist-items empty">
+            Generate a playlist to see clips here.
+          </div>
+        </div>
+
+        <aside class="player-panel">
+          <p class="eyebrow">Now Playing</p>
+          <h3 id="nowPlayingTitle">No clip selected</h3>
+          <p id="nowPlayingSummary" class="summary">
+            Prepare audio and click any playable clip to start listening.
+          </p>
+          <audio id="audioPlayer" controls preload="none"></audio>
+          <div class="transport">
+            <button class="ghost" data-command="previous">Previous</button>
+            <button class="ghost" data-command="repeat">Repeat</button>
+            <button class="ghost" data-command="next">Next</button>
+            <button class="ghost" data-command="explain more">Explain more</button>
+            <button class="ghost" data-command="stop">Stop</button>
+          </div>
+          <div id="commandOutput" class="command-output">Command responses appear here.</div>
+        </aside>
+      </section>
+    </main>
+    <script src="/web/app.js"></script>
+  </body>
+</html>

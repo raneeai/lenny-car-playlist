@@ -25,6 +25,7 @@ from app.themes import THEMES
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DATA_SOURCE_DIR = ROOT / "data-source"
 CACHE_DIR = ROOT / "data"
+WEB_DIR = ROOT / "web"
 CATALOG_PATH = CACHE_DIR / "catalog.json"
 AUDIO_INDEX_PATH = CACHE_DIR / "audio_index.json"
 AUDIO_EPISODES_DIR = CACHE_DIR / "audio" / "episodes"
@@ -102,6 +103,40 @@ def send_file(handler: BaseHTTPRequestHandler, file_path: pathlib.Path) -> None:
     handler.wfile.write(content)
 
 
+def prepare_playlist_audio(playlist: Dict[str, Any]) -> Dict[str, Any]:
+    audio_index = ensure_audio_index(force=False)
+    prepared = 0
+    skipped = 0
+    errors = []
+    for item in playlist.get("items", []):
+        audio_meta = audio_index.get(item["episode_id"])
+        if not audio_meta:
+            skipped += 1
+            continue
+        try:
+            source_path = AUDIO_EPISODES_DIR / ("%s.mp3" % item["episode_id"])
+            if not source_path.exists():
+                download_audio_file(audio_meta["audio_url"], source_path)
+            clip_path = AUDIO_CLIPS_DIR / ("%s.mp3" % item["clip_id"])
+            if not clip_path.exists():
+                render_clip(
+                    source_path,
+                    clip_path,
+                    int(item["start_sec"]),
+                    int(item["end_sec"]),
+                )
+            prepared += 1
+        except Exception as exc:
+            errors.append({"clip_id": item["clip_id"], "error": str(exc)})
+    annotate_playlist_with_audio(playlist)
+    return {
+        "prepared": prepared,
+        "skipped": skipped,
+        "errors": errors,
+        "playlist": playlist,
+    }
+
+
 class LennyHandler(BaseHTTPRequestHandler):
     server_version = "LennyExecutiveClips/0.1"
 
@@ -130,6 +165,13 @@ class LennyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
+        if parsed.path in {"/", "/index.html"}:
+            send_file(self, WEB_DIR / "index.html")
+            return
+        if parsed.path.startswith("/web/"):
+            asset_name = parsed.path.replace("/web/", "", 1)
+            send_file(self, WEB_DIR / asset_name)
+            return
         if parsed.path.startswith("/audio/clips/"):
             clip_name = pathlib.Path(parsed.path).name
             send_file(self, AUDIO_CLIPS_DIR / clip_name)
@@ -263,6 +305,16 @@ class LennyHandler(BaseHTTPRequestHandler):
                     "audio_local_path": str(output_path),
                 }
             )
+            return
+
+        if parsed.path == "/api/playlists/prepare":
+            playlist = STATE.get("last_playlist")
+            if not playlist:
+                self._send_json({"error": "No active playlist"}, status=400)
+                return
+            result = prepare_playlist_audio(playlist)
+            STATE["last_playlist"] = result["playlist"]
+            self._send_json(result)
             return
 
         if parsed.path == "/api/playlists":
