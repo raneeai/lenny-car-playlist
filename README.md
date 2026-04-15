@@ -30,10 +30,10 @@ This repo contains a local-testable MVP prototype for `Lenny Executive Clips`.
 - serves playable local audio files
 - serves a local web UI for playlist generation and playback at `/`
 - supports installable PWA metadata and offline app-shell caching
+- supports bulk audio prewarming through an API and local script
 
 ## What is not finished yet
 
-- automatic bulk audio download and clip prewarming
 - mobile UI / PWA
 - on-device speech-to-text
 - stronger title matching fallbacks for the full archive
@@ -88,6 +88,14 @@ Sync official audio mappings:
 curl -X POST http://127.0.0.1:8000/api/audio/sync
 ```
 
+Bulk prewarm top clips:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/audio/prewarm \
+  -H 'Content-Type: application/json' \
+  -d '{"theme":"ai","max_clips":8}'
+```
+
 Download one episode's source audio:
 
 ```bash
@@ -125,6 +133,19 @@ http://127.0.0.1:8000/audio/clips/amol-avasare-2836-2961.mp3
 - the browser registers a local service worker from `/sw.js`
 - the current PWA layer caches the app shell for faster reloads and installability
 - playlist data and audio files are still fetched live from the local server
+
+## Bulk prewarm
+
+Prewarm demo audio from the terminal:
+
+```bash
+python3 scripts/prewarm_audio.py ai 8
+```
+
+Arguments:
+
+- first argument: optional theme like `ai`, `growth`, or `leadership`
+- second argument: optional max clip count
 
 ## Project layout
 

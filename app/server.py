@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 from app.audio import (
     RSS_URL,
     build_audio_index,
+    count_cached_audio,
     download_audio_file,
     fetch_rss_xml,
     load_json,
@@ -137,6 +138,57 @@ def prepare_playlist_audio(playlist: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def prewarm_clips(
+    clips: list[Dict[str, Any]],
+    *,
+    theme: str | None = None,
+    max_clips: int = 12,
+) -> Dict[str, Any]:
+    audio_index = ensure_audio_index(force=False)
+    selected = clips
+    if theme:
+        selected = [clip for clip in selected if clip["theme"] == theme]
+    selected = selected[:max_clips]
+
+    prepared = 0
+    skipped = 0
+    errors = []
+    downloaded_episodes = set()
+
+    for clip in selected:
+        audio_meta = audio_index.get(clip["episode_id"])
+        if not audio_meta:
+            skipped += 1
+            continue
+        try:
+            source_path = AUDIO_EPISODES_DIR / ("%s.mp3" % clip["episode_id"])
+            if not source_path.exists():
+                download_audio_file(audio_meta["audio_url"], source_path)
+                downloaded_episodes.add(clip["episode_id"])
+            clip_path = AUDIO_CLIPS_DIR / ("%s.mp3" % clip["clip_id"])
+            if not clip_path.exists():
+                render_clip(
+                    source_path,
+                    clip_path,
+                    int(clip["start_sec"]),
+                    int(clip["end_sec"]),
+                )
+            prepared += 1
+        except Exception as exc:
+            errors.append({"clip_id": clip["clip_id"], "error": str(exc)})
+
+    cache_stats = count_cached_audio(AUDIO_EPISODES_DIR, AUDIO_CLIPS_DIR)
+    return {
+        "requested_theme": theme,
+        "requested_clip_count": len(selected),
+        "prepared": prepared,
+        "skipped": skipped,
+        "newly_downloaded_episode_count": len(downloaded_episodes),
+        "errors": errors,
+        **cache_stats,
+    }
+
+
 class LennyHandler(BaseHTTPRequestHandler):
     server_version = "LennyExecutiveClips/0.1"
 
@@ -192,12 +244,14 @@ class LennyHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/health":
             catalog = ensure_catalog(force=False)
             audio_index = ensure_audio_index(force=False)
+            cache_stats = count_cached_audio(AUDIO_EPISODES_DIR, AUDIO_CLIPS_DIR)
             self._send_json(
                 {
                     "ok": True,
                     "episode_count": catalog["episode_count"],
                     "clip_count": catalog["clip_count"],
                     "audio_episode_count": len(audio_index),
+                    **cache_stats,
                 }
             )
             return
@@ -248,13 +302,24 @@ class LennyHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/audio/sync":
             audio_index = ensure_audio_index(force=True)
+            cache_stats = count_cached_audio(AUDIO_EPISODES_DIR, AUDIO_CLIPS_DIR)
             self._send_json(
                 {
                     "ok": True,
                     "audio_episode_count": len(audio_index),
                     "sample_matches": list(audio_index.items())[:5],
+                    **cache_stats,
                 }
             )
+            return
+
+        if parsed.path == "/api/audio/prewarm":
+            catalog = ensure_catalog(force=False)
+            theme = str(payload.get("theme", "")).strip().lower() or None
+            max_clips = int(payload.get("max_clips", 12))
+            max_clips = max(1, min(max_clips, 30))
+            result = prewarm_clips(catalog["clips"], theme=theme, max_clips=max_clips)
+            self._send_json({"ok": True, **result})
             return
 
         if parsed.path == "/api/audio/download":

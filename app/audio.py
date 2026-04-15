@@ -180,3 +180,12 @@ def render_clip(source_audio_path: pathlib.Path, output_path: pathlib.Path, star
         if completed.returncode != 0:
             raise RuntimeError(completed.stderr.strip() or "ffmpeg failed to render clip")
     return output_path
+
+
+def count_cached_audio(episodes_dir: pathlib.Path, clips_dir: pathlib.Path) -> Dict[str, int]:
+    episode_count = len(list(episodes_dir.glob("*.mp3"))) if episodes_dir.exists() else 0
+    clip_count = len(list(clips_dir.glob("*.mp3"))) if clips_dir.exists() else 0
+    return {
+        "downloaded_episode_count": episode_count,
+        "rendered_clip_count": clip_count,
+    }
